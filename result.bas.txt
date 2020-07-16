@@ -1,0 +1,31 @@
+        Range("EUCA_METADATA").Offset(0, 1).Resize(1, 1).ClearContents 'EUCA_METADATA
+        Range("ALLOW_USERS_EDIT_RANGES").Offset(0, 1).Resize(1, 1).ClearContents 'ALLOW_USERS_EDIT_RANGES
+    End If
+'------------------------------------
+
+        Range("EUCA_METADATA").Offset(0, 1) = "YES"
+    End If
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    
+' +++++++++ check unprotected formula in "Allow Users to Edit Ranges" ++++++++++
+'v1.85 JUL2020
+    Set col = New Collection
+    Set col = com1.colUnprotectedFormulaAllowUsersEditRanges(xlwb)
+    If col.count > 0 Then
+        Range("ALLOW_USERS_EDIT_RANGES").Offset(0, 1) = "Exist"
+    
+        For i = 1 To col.count
+            tmpColumn = Range("BD1").Column
+            On Error Resume Next ' when address is long hyperlink returns error.
+            Cells(START_PRINTOUT_ROW + i - 1, tmpColumn).Value = "=HYPERLINK(""[" & xlwb.FullName & "]" & "'" & col(i).Range.Parent.Name & "'" & "!" & col(i).Range.address & """,""CLICK HERE"")"
+            On Error GoTo 0
+            On Error GoTo ErrHandler
+            Cells(START_PRINTOUT_ROW + i - 1, tmpColumn + 1).Value = col(i).Range.Parent.Name 'sheet name
+            Cells(START_PRINTOUT_ROW + i - 1, tmpColumn + 2).Value = col(i).Range.address ' cell address
+            Cells(START_PRINTOUT_ROW + i - 1, tmpColumn + 3).Value = col(i).Title ' title
+        Next i
+    End If
+
+    Set col = Nothing
+' ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    

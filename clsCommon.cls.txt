@@ -1,0 +1,44 @@
+
+'==============  EUCA metadata end =======================
+
+'==============  check unprotected formula in "Allow Users to Edit Ranges" start =======================
+Public Function colUnprotectedFormulaAllowUsersEditRanges(ByRef wb As Workbook) As Collection
+    On Error GoTo ErrHandler
+    Dim col As Collection
+    Dim c As Variant
+    Dim ws As Worksheet
+
+    For Each ws In wb.Worksheets
+        Set col = listUnprotectedAllowEditRange(ws)
+    Next ws
+
+    Set colUnprotectedFormulaAllowUsersEditRanges = col
+ErrHandler:
+End Function
+
+Private Function listUnprotectedAllowEditRange(ws As Worksheet) As Collection
+    On Error Resume Next
+
+    Dim colRet As Collection
+    Dim c As AllowEditRange
+
+    Set colRet = New Collection
+    For Each c In ws.Protection.AllowEditRanges
+        c.Unprotect
+        If Err.Number = 0 And IsNull(c.Range.HasFormula) Then
+            'MsgBox "there are unprotected formula" & vbCrLf & c.Range.Address & vbCrLf & c.Title
+            colRet.Add c
+        End If
+        Err.Clear
+    Next c
+    Set listUnprotectedAllowEditRange = colRet
+End Function
+
+'==============  check unprotected formula in "Allow Users to Edit Ranges" end   =======================
+
+    rng.Offset(-1, 0) = "Visible"
+    rng.Offset(-1, 1) = "Name"
+    rng.Offset(-1, 2) = "Refers To"
+    rng.Offset(-1, 3) = "Sheet"
+    rng.Offset(-1, 4) = "(address without sheet name)"
+    
